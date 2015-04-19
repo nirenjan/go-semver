@@ -1,0 +1,5 @@
+Semantic Versioning in Go
+=========================
+
+The Go semver package implements Semantic Versioning 2.0.0 as specified at
+http://semver.org
