@@ -1,3 +1,5 @@
+// Package semver contains an implementation of the Semantic Versioning
+// scheme, specifically version 2.0.0 as specified at http://semver.org/
 package semver
 
 // SemVer is the default structure which contains the fields Major, Minor,
