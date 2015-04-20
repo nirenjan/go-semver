@@ -8,8 +8,8 @@ type SemVer struct {
 	Major      uint     // Major version number
 	Minor      uint     // Minor version number
 	Patch      uint     // Patch version number
-	Prerelease []string // Prerelease information
-	Metadata   []string // Build metadata
+	prerelease []string // Prerelease information
+	metadata   []string // Build metadata
 }
 
 func emptySemVer() SemVer {
