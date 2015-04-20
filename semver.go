@@ -1,11 +1,13 @@
 package semver
 
+// SemVer is the default structure which contains the fields Major, Minor,
+// Patch, and optional Prerelease and Metadata
 type SemVer struct {
-	major      uint
-	minor      uint
-	patch      uint
-	prerelease []string
-	metadata   []string
+	Major      uint     // Major version number
+	Minor      uint     // Minor version number
+	Patch      uint     // Patch version number
+	Prerelease []string // Prerelease information
+	Metadata   []string // Build metadata
 }
 
 func emptySemVer() SemVer {
