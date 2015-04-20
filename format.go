@@ -8,7 +8,7 @@ import (
 // String converts the semver argument into a string of the form
 // <major>.<minor>.<patch>[-<pre.release>][+<meta.data>]
 func (ver SemVer) String() string {
-	str := fmt.Sprintf("%u.%u.%u", ver.Major, ver.Minor, ver.Patch)
+	str := fmt.Sprintf("%d.%d.%d", ver.Major, ver.Minor, ver.Patch)
 
 	if len(ver.prerelease) > 0 {
 		str += "-" + strings.Join(ver.prerelease, ".")
