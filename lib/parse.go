@@ -1,6 +1,6 @@
 // Package semver implements the Semantic Versioning parser and manipulator
 // This package conforms to the Semantic Versioning specification 2.0.0
-package lib
+package lib // import "nirenjan.org/semver/lib"
 
 import (
 	"fmt"
@@ -35,16 +35,22 @@ func Parse(version string) (SemVer, error) {
 	if err != nil {
 		return SemVer{}, err
 	}
+	if len(v) == 0 {
+		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got empty string")
+	}
 	if v[0] != '.' {
-		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got '%#v'", v[0])
+		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got '%s'", string(v[0]))
 	}
 
 	semver.minor, v, err = parseInt(v[1:])
 	if err != nil {
 		return SemVer{}, err
 	}
+	if len(v) == 0 {
+		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got empty string")
+	}
 	if v[0] != '.' {
-		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got '%#v'", v[0])
+		return SemVer{}, fmt.Errorf("invalid semantic version, expecting '.', got '%s'", string(v[0]))
 	}
 
 	semver.patch, v, err = parseInt(v[1:])
@@ -63,23 +69,27 @@ func Parse(version string) (SemVer, error) {
 	}
 
 	if v != "" {
-		return SemVer{}, fmt.Errorf("unexpected trailing value '%#v'", v)
+		return SemVer{}, fmt.Errorf("unexpected trailing value '%s'", v)
 	}
 
 	return semver, nil
 }
 
 func parseInt(v string) (uint, string, error) {
-	var i uint
+	var i int
 	var val uint
 
-	for ; v[i] >= '0' && v[i] <= '9'; i++ {
+	for ; i < len(v) && v[i] >= '0' && v[i] <= '9'; i++ {
 		val *= 10
 		val += (uint)(v[i] - '0')
 
 		if v[0] == '0' && i > 0 {
-			return 0, v, fmt.Errorf("Leading zeroes in integer field: %#v", v)
+			return 0, v, fmt.Errorf("leading zeroes in integer field '%s'", v)
 		}
+	}
+
+	if i == 0 {
+		return 0, v, fmt.Errorf("invalid integer field '%s'", v)
 	}
 
 	return val, v[i:], nil
