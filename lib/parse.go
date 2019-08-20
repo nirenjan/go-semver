@@ -95,10 +95,95 @@ func parseInt(v string) (uint, string, error) {
 	return val, v[i:], nil
 }
 
+func hasLeadingZeroes(field string) bool {
+	possibly_numeric := true
+	for _, c := range field {
+		if c < '0' || c > '9' {
+			possibly_numeric = false
+			break
+		}
+	}
+	return possibly_numeric && len(field) > 1 && field[0] == '0'
+}
+
+func parseFields(v string, numeric bool) ([]string, string, error) {
+	var field string
+	var fields []string
+	var i int
+	var c rune
+
+	for i, c = range v {
+		switch {
+		case c >= 'A' && c <= 'Z':
+			fallthrough
+		case c >= 'a' && c <= 'z':
+			fallthrough
+		case c >= '0' && c <= '9':
+			fallthrough
+		case c == '-':
+			field += string(c)
+		case c == '.':
+			// This is the separator field
+			if field == "" {
+				return []string{}, v, fmt.Errorf("unexpected '.' in dot-separated field")
+			}
+			if numeric && hasLeadingZeroes(field) {
+				return []string{}, v, fmt.Errorf("leading zeroes in numeric field '%s' of prerelease", field)
+			}
+			fields = append(fields, field)
+			field = "" // reset the field for the next round
+		case c == '+' && numeric:
+			// Accept the +, but break out of the loop and return the
+			// computed fields
+			i--
+			break
+		default:
+			return []string{}, v, fmt.Errorf("unexpected character '%s' in dot-separated field", string(c))
+		}
+	}
+
+	if field != "" {
+		if numeric && hasLeadingZeroes(field) {
+			return []string{}, v, fmt.Errorf("leading zeroes in numeric field '%s' of prerelease", field)
+		}
+
+		fields = append(fields, field)
+	} else if len(fields) > 0 {
+		return []string{}, v, fmt.Errorf("invalid dot-separated field")
+	}
+
+	if len(fields) == 0 {
+		return []string{}, v, fmt.Errorf("invalid dot-separated field '%s'", v)
+	}
+
+	return fields, v[i+1:], nil
+}
+
 func parsePrerelease(v string) ([]string, string, error) {
-	return []string{}, v, nil
+	if len(v) == 0 {
+		return []string{}, v, nil
+	}
+
+	if v[0] == '+' {
+		// There is no pre-release field, this is a build-metadata field.
+		return []string{}, v, nil
+	}
+
+	if v[0] != '-' {
+		return []string{}, v, fmt.Errorf("invalid prerelease marker, expecting '-', got '%s'", string(v[0]))
+	}
+
+	return parseFields(v[1:], true)
 }
 
 func parseBuild(v string) ([]string, string, error) {
-	return []string{}, v, nil
+	if len(v) == 0 {
+		return []string{}, v, nil
+	}
+
+	if v[0] != '+' {
+		return []string{}, v, fmt.Errorf("invalid build metadata marker, expecting '+', got '%s'", string(v[0]))
+	}
+
+	return parseFields(v[1:], false)
 }

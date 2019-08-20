@@ -49,15 +49,33 @@ func TestParsing(t *testing.T) {
 		{"0.0.0", SemVer{0, 0, 0, []string{}, []string{}}, ""},
 		{"0.1.2", SemVer{0, 1, 2, []string{}, []string{}}, ""},
 		{"0.01.2", SemVer{}, "leading zeroes in integer field '01.2'"},
+
 		{"0", SemVer{}, "invalid semantic version, expecting '.', got empty string"},
 		{"0.", SemVer{}, "invalid integer field ''"},
 		{"0+", SemVer{}, "invalid semantic version, expecting '.', got '+'"},
+
 		{"0.0", SemVer{}, "invalid semantic version, expecting '.', got empty string"},
 		{"0.0.", SemVer{}, "invalid integer field ''"},
 		{"0.0+", SemVer{}, "invalid semantic version, expecting '.', got '+'"},
+
 		{"0.0.0", SemVer{}, ""},
-		{"0.0.0.", SemVer{}, "unexpected trailing value '.'"},
-		{"0.0.0=", SemVer{}, "unexpected trailing value '='"},
+		{"0.0.0.", SemVer{}, "invalid prerelease marker, expecting '-', got '.'"},
+		{"0.0.0=", SemVer{}, "invalid prerelease marker, expecting '-', got '='"},
+
+		{"1.2.3", SemVer{1, 2, 3, []string{}, []string{}}, ""},
+		{"1.2.3-a", SemVer{1, 2, 3, []string{"a"}, []string{}}, ""},
+		{"1.2.3-a.10", SemVer{1, 2, 3, []string{"a", "10"}, []string{}}, ""},
+		{"1.2.3-a.10.b", SemVer{1, 2, 3, []string{"a", "10", "b"}, []string{}}, ""},
+		{"1.2.3-a.0.b", SemVer{1, 2, 3, []string{"a", "0", "b"}, []string{}}, ""},
+		{"1.2.3-a..b", SemVer{}, "unexpected '.' in dot-separated field"},
+		{"1.2.3-a.10.b.", SemVer{}, "invalid dot-separated field"},
+		{"1.2.3-a.010", SemVer{}, "leading zeroes in numeric field '010' of prerelease"},
+		{"1.2.3-a.00.1", SemVer{}, "leading zeroes in numeric field '00' of prerelease"},
+		{"1.2.3-", SemVer{}, "invalid dot-separated field ''"},
+		{"1.2.3-.1", SemVer{}, "unexpected '.' in dot-separated field"},
+
+		{"1.2.3+g", SemVer{1, 2, 3, []string{}, []string{"g"}}, ""},
+
 		{"foo", SemVer{}, "invalid integer field 'foo'"},
 		{".", SemVer{}, "invalid integer field '.'"},
 	}
