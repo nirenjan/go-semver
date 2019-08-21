@@ -3,18 +3,18 @@
 package semver
 
 import (
-	"nirenjan.org/semver/lib"
+	"nirenjan.org/semver/core"
 )
 
 // SemVer holds the parsed semantic version
 type SemVer struct {
-	semver lib.SemVer
+	semver core.SemVer
 }
 
 // Parse parses a string containing a Semantic Version and returns the
 // parsed SemVer structure, or an error if it encountered any
 func Parse(version string) (SemVer, error) {
-	semver, err := lib.Parse(version)
+	semver, err := core.Parse(version)
 
 	if err != nil {
 		return SemVer{}, err
