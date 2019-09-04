@@ -1,6 +1,6 @@
 // Package semver implements the Semantic Versioning parser and manipulator
 // This package conforms to the Semantic Versioning specification 2.0.0
-package core // import "nirenjan.org/semver/core"
+package semver // import "nirenjan.org/semver"
 
 import (
 	"fmt"
